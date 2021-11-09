@@ -1,9 +1,16 @@
+import time
+
 import pandas as pd
 import numpy as np
+from catboost import CatBoostClassifier
+from lightgbm import LGBMClassifier
+from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier, AdaBoostClassifier, \
+    GradientBoostingClassifier, HistGradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GroupShuffleSplit
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
+from xgboost import XGBClassifier
 
 
 def analysis_nulls(data):
@@ -78,24 +85,52 @@ def get_x_y (data):
 
 if __name__ == "__main__":
     data = pd.read_csv('dataset_halfSecondWindow.csv', index_col=0)
-    X,y = get_x_y(data)
     #split teniendo en cuenta los users
-    gs = GroupShuffleSplit(n_splits=2, train_size=.85, random_state=42)
-    train_ix, test_ix = next(gs.split(X, y, groups=X.user))
-    X_train = X.loc[train_ix]
-    y_train = y.loc[train_ix]
-    X_test = X.loc[test_ix]
-    y_test = y.loc[test_ix]
+    seeds=[0]#, 42, 100]
+    for seed in seeds:
+        X, y = data.drop('target', axis=1),data['target']
+        gs = GroupShuffleSplit(n_splits=2, train_size=.8, random_state=seed)
+        train_ix, test_ix = next(gs.split(X, y, groups=X.user))
+        train = data.loc[train_ix]
+        test = data.loc[test_ix]
 
-    X_train, X_test = X_train.drop('user', axis=1), X_test.drop('user', axis=1)
+        X_train, y_train = get_x_y(train)
+        X_train = X_train.drop('user', axis=1)
 
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+        test = test[train.columns.to_list()]
+        for col in X_train.columns.to_list():
+            test[col] = test[col].fillna(train[col].mean())
 
-    decision_tree = DecisionTreeClassifier(random_state=42)
-    decision_tree.fit(X_train, y_train)
-    y_pred = decision_tree.predict(X_test)
-    print(metrics.accuracy_score(y_test, y_pred)*100)
+        X_test, y_test = test.drop('target', axis=1), test['target']
+        X_test = X_test.drop('user', axis=1)
+
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        tree_classifiers = {
+            "Decision Tree": DecisionTreeClassifier(random_state=seed),
+            "Extra Trees": ExtraTreesClassifier(random_state=seed,n_estimators=100),
+            "Random Forest": RandomForestClassifier(random_state=seed,n_estimators=100),
+            "AdaBoost": AdaBoostClassifier(random_state=seed,n_estimators=100),
+            #"Skl GBM": GradientBoostingClassifier(random_state=42,n_estimators=100),
+            "Skl HistGBM": HistGradientBoostingClassifier(random_state=seed,max_iter=100),
+            "XGBoost": XGBClassifier(random_state=seed,n_estimators=100),
+            "LightGBM": LGBMClassifier(random_state=seed,n_estimators=100),
+            "CatBoost": CatBoostClassifier(random_state=seed,n_estimators=100),
+        }
+
+        locals()["results_" + str(seed)] = pd.DataFrame({'Model': [], 'Accuracy': [], 'Bal Acc.': [], 'Time': []})
+        for model_name, model in tree_classifiers.items():
+            start_time = time.time()
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            total_time = time.time() - start_time
+            locals()["results_" + str(seed)]  = locals()["results_" + str(seed)] .append({"Model": model_name,
+                                      "Accuracy": metrics.accuracy_score(y_test, y_pred) * 100,
+                                      "Bal Acc.": metrics.balanced_accuracy_score(y_test, y_pred) * 100,
+                                      "Time": total_time},
+                                     ignore_index=True)
+            print(f'{seed}:{model} done in {total_time}')
 
     print('jaja')
