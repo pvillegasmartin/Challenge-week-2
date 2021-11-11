@@ -16,7 +16,11 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 data = pd.read_csv('dataset_halfSecondWindow.csv', index_col=0)
 data.drop(columns=['id','activityrecognition#0', 'activityrecognition#1', 'time'] ,inplace=True, axis=1)
 
-features = ['target','user','android.sensor.accelerometer#mean', 'android.sensor.gyroscope#max', 'sound#std', 'android.sensor.gyroscope#mean', 'android.sensor.gyroscope#std', 'android.sensor.gyroscope#min', 'sound#min', 'android.sensor.accelerometer#std', 'android.sensor.accelerometer#max', 'android.sensor.accelerometer#min', 'sound#mean', 'sound#max']
+
+features = ['target', 'user', 'android.sensor.accelerometer#mean', 'android.sensor.accelerometer#min', 'android.sensor.accelerometer#max', 'android.sensor.accelerometer#std',
+            'android.sensor.gyroscope#mean', 'android.sensor.gyroscope#min', 'android.sensor.gyroscope#max', 'android.sensor.gyroscope#std',
+            'sound#mean', 'sound#max', 'sound#min', 'sound#std']
+
 
 #prueba: quitar lo que no son means
 for feature in data.columns.to_list():
@@ -26,7 +30,7 @@ for feature in data.columns.to_list():
         data.drop(columns=[feature], inplace=True, axis=1)
 
 
-seeds=[0]#, 42, 100]
+seeds=[42]#, 42, 100]
 for seed in seeds:
     X, y = data.drop('target', axis=1),data['target']
     # split teniendo en cuenta los users
@@ -45,14 +49,14 @@ for seed in seeds:
 
 
     test = test[train.columns.to_list()]
-    for col in X_train.columns.to_list():
+    for var in X_train.columns.to_list():
         '''
         if test[var].isnull().sum()/test.shape[0] > 0.8:
             test[col] = test[col].fillna(X_train[col].median())
         else:
             test[col] = test[col].fillna(test[col].median())
         '''
-        test[col] = test[col].fillna(X_train[col].mean())
+        test[var] = test[var].fillna(X_train[var].mean())
     X_test, y_test = test.drop('target', axis=1), test['target']
     X_test = X_test.drop('user', axis=1)
 

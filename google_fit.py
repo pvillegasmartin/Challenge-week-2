@@ -26,24 +26,26 @@ def analysis_nulls(data):
 
 def sorting_nulls(data):
     '''Manage the null values in diferent ways:
-        - Droping column if all targets has >79% of null values
+        - Droping column if all targets has >75% of null values
         -
     '''
     perc_nulls = analysis_nulls(data)
-    #deleting all features with more than 80% of null values over all clusters (targets)
+    #deleting all features with more than 75% of null values over all clusters (targets)
     threshold = 0.75
     columns_to_delete = perc_nulls[(perc_nulls[0]>threshold) & (perc_nulls['Bus']>threshold) & (perc_nulls['Walking']>threshold) & (perc_nulls['Train']>threshold) & (perc_nulls['Car']>threshold) & (perc_nulls['Still']>threshold)]
     data.drop(columns=list(columns_to_delete.index), inplace=True, axis=1)
     perc_nulls = perc_nulls.loc[~perc_nulls.index.isin(columns_to_delete.index)]
 
-    #deleting other columns
+    '''
+    #deleting other columns that have the same exact values as #mean column
     columns_to_delete = ['android.sensor.step_counter#min', 'android.sensor.step_counter#max', 'speed#max', 'speed#min', 'android.sensor.rotation_vector#min', 'android.sensor.rotation_vector#max']
     data.drop(columns=columns_to_delete, inplace=True, axis=1)
-
+    '''
 
     perc_nulls = analysis_nulls(data)
     for var in perc_nulls.index:
-        data[var] = data[var] / data["time"]
+        #verify if it really has sense to divide it by time
+        #data[var] = data[var] / data["time"]
         data[[var]] = data.groupby("target").transform(lambda x: x.fillna(x.mean()))[[var]]
 
     '''
@@ -62,14 +64,11 @@ def sorting_nulls(data):
     #fill with the mean of the main feature
     for el in data['target'].unique():
         data[['sound#min','sound#max','android.sensor.proximity#max', 'android.sensor.proximity#min']] = data.groupby("target").fillna(data[data['target']==el]['sound#mean'].mean())[['sound#min','sound#max','android.sensor.proximity#max', 'android.sensor.proximity#min']]
+    
+
+    filling features that 0 means nothing for them
+    data[['speed#mean','speed#max']] = data[['speed#mean','speed#max']].fillna(0)
     '''
-
-    #filling features that 0 means nothing for them
-    #data[['speed#mean','speed#max']] = data[['speed#mean','speed#max']].fillna(0)
-
-
-    #TODO ELIMINAR - sirve para ir modificando las columnas
-    perc_nulls = analysis_nulls(data)
 
     columns_to_delete = ['time']
     data.drop(columns=columns_to_delete, inplace=True, axis=1)
@@ -86,7 +85,7 @@ def get_x_y (data):
 if __name__ == "__main__":
     data = pd.read_csv('dataset_halfSecondWindow.csv', index_col=0)
     #split teniendo en cuenta los users
-    seeds=[0]#, 42, 100]
+    seeds=[0, 42, 100,1000, 58]
     for seed in seeds:
         X, y = data.drop('target', axis=1),data['target']
         gs = GroupShuffleSplit(n_splits=2, train_size=.8, random_state=seed)
@@ -94,36 +93,52 @@ if __name__ == "__main__":
         train = data.loc[train_ix]
         test = data.loc[test_ix]
 
+        print(train['user'].unique())
+        print(test['user'].unique())
+
         X_train, y_train = get_x_y(train)
+        X_train = X_train.reset_index(drop=True)
+
+
+        y_train = y_train.reset_index(drop=True)
         X_train = X_train.drop('user', axis=1)
 
+        #Outliers out
+        data_prev = X_train
+        Q1 = X_train.quantile(0.25)
+        Q3 = X_train.quantile(0.75)
+        IQR = Q3 - Q1
+        X_train_out = data_prev[~((data_prev < (Q1 - 1.5 * IQR)) | (data_prev > (Q3 + 1.5 * IQR))).any(axis=1)]
+        y_train_out = y_train.iloc[X_train_out.index]
+
+
         test = test[train.columns.to_list()]
-        for col in X_train.columns.to_list():
-            test[col] = test[col].fillna(train[col].mean())
+        for col in X_train_out.columns.to_list():
+            test[col] = test[col].fillna(X_train_out[col].mean())
 
         X_test, y_test = test.drop('target', axis=1), test['target']
         X_test = X_test.drop('user', axis=1)
 
         scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
+        X_train_out = scaler.fit_transform(X_train_out)
         X_test = scaler.transform(X_test)
 
         tree_classifiers = {
-            "Decision Tree": DecisionTreeClassifier(random_state=seed),
-            "Extra Trees": ExtraTreesClassifier(random_state=seed,n_estimators=100),
+            #"Decision Tree": DecisionTreeClassifier(random_state=seed),
+            #"Extra Trees": ExtraTreesClassifier(random_state=seed,n_estimators=100),
             "Random Forest": RandomForestClassifier(random_state=seed,n_estimators=100),
-            "AdaBoost": AdaBoostClassifier(random_state=seed,n_estimators=100),
+            #"AdaBoost": AdaBoostClassifier(random_state=seed,n_estimators=100),
             #"Skl GBM": GradientBoostingClassifier(random_state=42,n_estimators=100),
-            "Skl HistGBM": HistGradientBoostingClassifier(random_state=seed,max_iter=100),
-            "XGBoost": XGBClassifier(random_state=seed,n_estimators=100),
-            "LightGBM": LGBMClassifier(random_state=seed,n_estimators=100),
-            "CatBoost": CatBoostClassifier(random_state=seed,n_estimators=100),
+            #"Skl HistGBM": HistGradientBoostingClassifier(random_state=seed,max_iter=100),
+            #"XGBoost": XGBClassifier(random_state=seed,n_estimators=100),
+            #"LightGBM": LGBMClassifier(random_state=seed,n_estimators=100),
+            #"CatBoost": CatBoostClassifier(random_state=seed,n_estimators=100),
         }
 
         locals()["results_" + str(seed)] = pd.DataFrame({'Model': [], 'Accuracy': [], 'Bal Acc.': [], 'Time': []})
         for model_name, model in tree_classifiers.items():
             start_time = time.time()
-            model.fit(X_train, y_train)
+            model.fit(X_train_out, y_train_out)
             y_pred = model.predict(X_test)
             total_time = time.time() - start_time
             locals()["results_" + str(seed)]  = locals()["results_" + str(seed)] .append({"Model": model_name,
@@ -131,6 +146,7 @@ if __name__ == "__main__":
                                       "Bal Acc.": metrics.balanced_accuracy_score(y_test, y_pred) * 100,
                                       "Time": total_time},
                                      ignore_index=True)
+            print(metrics.accuracy_score(y_test, y_pred) * 100)
             print(f'{seed}:{model} done in {total_time}')
 
     print('jaja')
