@@ -36,6 +36,8 @@ class CredentialsScreen(Screen):
     def comprovar_mail(self, mail):
         try:
             if self.registered[mail]:
+                app = App.get_running_app()
+                app.mail = mail
                 return True
             else:
                 return False
@@ -56,10 +58,12 @@ class CredentialsScreen(Screen):
 
 class NewScreen(Screen):
 
-    def comprovar(self, age, gender, weight, height, mail, password):
+    def comprovar(self,name, surname, age, gender, weight, height, mail, password):
+        con = sl.connect('google_fit.db')
+        df_user = pd.read_sql_query("SELECT * FROM USER", con)
         nulls = [None, '', np.NAN]
-        if age not in nulls and age!='Type your age' and gender not in nulls and gender in 'wmWM' and weight not in nulls and weight!='Type your weight' and height not in nulls and height!='Type your height' and mail not in nulls and mail!='Type your mail' and password not in nulls and password!='Type your password'\
-                and age.isnumeric() and weight.isnumeric() and height.isnumeric() and '@' in mail and '.' in mail:
+        if name not in nulls and name != 'Type your name' and surname not in nulls and surname != 'Type your surname' and age not in nulls and age!='Type your age' and gender not in nulls and gender in 'wmWM' and weight not in nulls and weight!='Type your weight' and height not in nulls and height!='Type your height' and mail not in nulls and mail!='Type your mail' and password not in nulls and password!='Type your password'\
+                and age.isnumeric() and weight.isnumeric() and height.isnumeric() and '@' in mail and '.' in mail and mail not in df_user['mail'].values:
             app = App.get_running_app()
             app.mail = self.ids.mail.text
             return True
@@ -84,7 +88,7 @@ class ProfileScreen(Screen):
     email = 'alice@gmail.com'
     user = 1
 
-    my_progress = 0
+    my_progress = NumericProperty()
     to_walk = 0
     dict_rec = {'16':10, '17':15, '20':30, '27':45, '30':60}
     BMI = 0
@@ -92,6 +96,9 @@ class ProfileScreen(Screen):
     count = 0
     data = pd.DataFrame()
     name_user = StringProperty()
+    bmr = 0
+    calorias = NumericProperty()
+
 
     def cargar_datos_vacios(self):
         self.my_progress=0
@@ -102,16 +109,10 @@ class ProfileScreen(Screen):
         try:
             self.user = df_user['id'][0]
             self.BMI = float(df_user['weight'][0])/(df_user['height'][0]/100)**2
-            if df_user['gender'].values[0] in 'wW':
-                if df_user['age'].values[0] < 40:
-                    self.name_user = 'Miss ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
-                else:
-                    self.name_user = 'Mrs. ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
-            else:
-                if df_user['age'].values[0] < 40:
-                    self.name_user = 'Sir ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
+            self.calorias = int(self.bmr * 1.2)
         except:
             self.user = 1
+            self.name_user = '¡WELCOME!'
 
         con.close()
         self.image_path = 'empty_profile.png'
@@ -127,13 +128,19 @@ class ProfileScreen(Screen):
 
         self.user = df_user['id'].values[0]
         if df_user['gender'].values[0] in 'wW':
+            self.bmr = 88.362 + (13.397 * df_user['weight'].values[0]) + (4.799 * df_user['height'].values[0]) - (
+                        5.677 * df_user['age'].values[0])
             if df_user['age'].values[0] < 40:
                 self.name_user = 'Miss ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
             else:
                 self.name_user = 'Mrs. ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
         else:
+            self.bmr = 447.593 + (9.247 * df_user['weight'].values[0]) + (3.098 * df_user['height'].values[0]) - (
+                        4.330 * df_user['age'].values[0])
             if df_user['age'].values[0] < 40:
                 self.name_user = 'Sir ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
+
+        self.calorias = int(self.bmr * 1.2)
 
         self.BMI = float(df_user['weight'].values[0]) / (df_user['height'].values[0] / 100) ** 2
         self.BMI = round(self.BMI, 1)
@@ -154,7 +161,7 @@ class ProfileScreen(Screen):
             else:
                 key = '30'
             self.to_walk = self.dict_rec[key]
-            self.my_progress = (self.data["walking"].sum()/60)*15/self.to_walk
+            self.my_progress = int((self.data["walking"].sum()/60)*15/self.to_walk)
             fig = plt.figure(figsize=(15, 10), facecolor='#faf5e5')
             ax = fig.add_subplot(1, 1, 1)
 
@@ -184,14 +191,19 @@ class ProfileScreen(Screen):
 
         self.user = int(df_user['id'].values[0])
         if df_user['gender'].values[0] in 'wW':
+            self.bmr= 88.362 + (13.397 * df_user['weight'].values[0]) + (4.799*df_user['height'].values[0]) - (5.677 * df_user['age'].values[0])
             if df_user['age'].values[0] < 40:
                 self.name_user = 'Miss ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
             else:
                 self.name_user = 'Mrs. ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
         else:
+            self.bmr = 447.593 +(9.247*df_user['weight'].values[0])+(3.098*df_user['height'].values[0])-(4.330*df_user['age'].values[0])
             if df_user['age'].values[0] < 40:
                 self.name_user = 'Sir ' + df_user['name'].values[0] + ' ' + df_user['surname'].values[0]
-        print(self.name_user)
+
+
+        self.calorias = int(self.bmr * 1.2)
+
         if self.count == 0:
             #TODO info coming from sensors
             new_info = pd.read_csv('test_U11.csv')
@@ -248,7 +260,7 @@ class ProfileScreen(Screen):
 
         if self.my_progress >= 100:
             self.celebration = True
-        return self.cargar_datos()
+        return self.cargar_datos(), self.my_progress
 
 
 

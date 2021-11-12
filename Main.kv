@@ -109,6 +109,11 @@ ScreenManager:
         on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").cargar_datos()
         on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.pie_chart.source = root.manager.get_screen("profile_screen").cargar_datos()[0]
         on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.bmi.text = 'BMI: ' + str(root.manager.get_screen("profile_screen").cargar_datos()[1])
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.progress_bar.value=root.manager.get_screen("profile_screen").refresh_data()[1]
+
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text) and root.manager.get_screen("profile_screen").refresh_data()[1]<30: root.manager.get_screen("profile_screen").ids.label_progress.color = utils.get_color_from_hex('#e35744')
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text) and (root.manager.get_screen("profile_screen").refresh_data()[1]>=30 and root.manager.get_screen("profile_screen").refresh_data()[1]<=65): root.manager.get_screen("profile_screen").ids.label_progress.color = utils.get_color_from_hex('#e3d344')
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text) and root.manager.get_screen("profile_screen").refresh_data()[1]>65: root.manager.get_screen("profile_screen").ids.label_progress.color = utils.get_color_from_hex('#6ab562')
 
     Button:
         text: "Back"
@@ -239,9 +244,9 @@ ScreenManager:
         pos_hint: {"center_x": 0.57, "center_y": 0.07}
         size_hint : (.1, .05)
 
-        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): app.root.current = 'profile_screen'
-        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.insertar(root.ids.name.text,root.ids.surname.text,root.ids.gender.text,root.ids.age.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text)
-        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").cargar_datos_vacios()
+
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.insertar(root.ids.name.text,root.ids.surname.text,root.ids.gender.text,root.ids.age.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text)
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").cargar_datos_vacios()
 
         on_press: if not root.ids.age.text.isnumeric() or root.ids.age.text=='Type your age'  or root.ids.age.text=='': root.ids.age.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if not root.ids.weight.text.isnumeric() or root.ids.weight.text=='Type your weight [kg]'  or root.ids.weight.text=='': root.ids.weight.background_color = utils.get_color_from_hex('#fadcdc')
@@ -249,6 +254,9 @@ ScreenManager:
         on_press: if '@' not in root.ids.mail.text or root.ids.mail.text=='Type your mail'  or root.ids.mail.text=='': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if root.ids.password.text=='Type your password'  or root.ids.password.text=='': root.ids.password.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if not root.ids.gender.text in 'wmWM': root.ids.gender.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if root.ids.name.text == '' or root.ids.name.text == 'Type your name': root.ids.name.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if root.ids.surname.text == '' or root.ids.surname.text == 'Type your surname': root.ids.surname.background_color = utils.get_color_from_hex('#fadcdc')
+
 
         on_press: if root.ids.age.text.isnumeric(): root.ids.age.background_color = utils.get_color_from_hex('#f0efef')
         on_press: if root.ids.weight.text.isnumeric() and int(root.ids.weight.text)>0 and int(root.ids.weight.text)<300: root.ids.weight.background_color = utils.get_color_from_hex('#f0efef')
@@ -256,10 +264,14 @@ ScreenManager:
         on_press: if '@' in root.ids.mail.text and '.' in root.ids.mail.text: root.ids.mail.background_color = utils.get_color_from_hex('#f0efef')
         on_press: if root.ids.password.text!='Type your password'  and root.ids.password.text!='': root.ids.password.background_color = utils.get_color_from_hex('#f0efef')
         on_press: if root.ids.gender.text in 'wmWM': root.ids.gender.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.name.text != '' and root.ids.name.text != 'Type your name': root.ids.name.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.surname.text != '' and root.ids.surname.text != 'Type your surname': root.ids.surname.background_color = utils.get_color_from_hex('#f0efef')
 
-        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.bmi.text = 'BMI: ' + str(root.manager.get_screen("profile_screen").cargar_datos_vacios()[1])
-        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.pie_chart.source = root.manager.get_screen("profile_screen").cargar_datos_vacios()[0]
-
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.progress_bar.value=0
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.bmi.text = 'BMI: ' + str(root.manager.get_screen("profile_screen").cargar_datos_vacios()[1])
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.pie_chart.source = root.manager.get_screen("profile_screen").cargar_datos_vacios()[0]
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): app.root.current = 'profile_screen'
+        on_press: if root.comprovar(root.ids.name.text, root.ids.surname.text,root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.label_progress.color=123, 227, 111, 100
 
     Button:
         text: "Back"
@@ -290,19 +302,19 @@ ScreenManager:
         pos_hint : {"center_x": 0.5, 'center_y':.90}
         font_size: root.width/17
         color: 123, 227, 111, 100
-        text: (root.name_user).upper()
+        text: 'WELCOME!'
 
     Label:
         id: label_progress
-        pos_hint : {"x": 0.025, 'center_y':.8}
+        pos_hint : {"left_x": -0.525, 'center_y':.8}
+        size_hint : (.2, .05)
         font_size: 16
-        size_hint : (.15, .05)
         color: 123, 227, 111, 100
         text: "Today's progress:"
     ProgressBar:
         id: progress_bar
         pos_hint : {"x": 0.25, 'center_y':.795}
-        size_hint : (.3, .05)
+        size_hint : (.3, .15)
         background_color: 0.5,0.5,0.5,1
         color: 0.5,0.5,0.5,1
         value: root.my_progress
@@ -310,23 +322,40 @@ ScreenManager:
         max: 100
 
     Label:
-        id: bmi
-        pos_hint : {"x": 0.025, 'center_y':.75}
+        id: num_progress
+        pos_hint : {"x": 0.109, 'center_y':.8}
+        size_hint : (.2, .05)
         font_size: 16
-        size_hint : (.1, .05)
+        color: root.ids.label_progress.color
+        text: str(root.my_progress) + ' %'
+
+    Label:
+        id: bmi
+        pos_hint : {"left_x": -0.525, 'center_y':.755}
+        size_hint : (.2, .05)
+        font_size: 16
         color: 123, 227, 111, 100
+
+    Label:
+        id: calorias
+        pos_hint : {"left_x": -0.525, 'center_y':.71}
+        size_hint : (.2, .05)
+        font_size: 16
+        color: 123, 227, 111, 100
+        text: 'Rec. calories: ' + str(root.calorias)
+
 
     Button:
         text: "Refresh"
         background_color: 2,1,1,1
         pos_hint : {"center_x": 0.925, 'center_y':.95}
         size_hint : (.1, .05)
-        on_press: root.ids.pie_chart.source = root.refresh_data()[0]
-        on_press: root.ids.bmi.text = 'BMI: ' + str(root.refresh_data()[1])
+        on_press: root.ids.pie_chart.source = root.refresh_data()[0][0]
+        on_press: root.ids.bmi.text = 'BMI: ' + str(root.refresh_data()[0][1])
 
-        on_press: if root.my_progress<30: root.ids.progress_bar.color = utils.get_color_from_hex('#e35744')
-        on_press: if (root.my_progress>=30 and root.my_progress<=65): root.ids.progress_bar.color = utils.get_color_from_hex('#e3d344')
-        on_press: if (root.my_progress>65 and root.my_progress<=100): root.ids.progress_bar.color = utils.get_color_from_hex('#6ab562')
+        on_press: if root.my_progress<30: root.ids.label_progress.color = utils.get_color_from_hex('#e35744')
+        on_press: if (root.my_progress>=30 and root.my_progress<=65): root.ids.label_progress.color = utils.get_color_from_hex('#e3d344')
+        on_press: if root.my_progress>65: root.ids.label_progress.color = utils.get_color_from_hex('#6ab562')
 
         on_release: root.ids.progress_bar.value=root.my_progress
 

@@ -4,12 +4,13 @@ import pickle
 import numpy as np
 con = sl.connect('google_fit.db')
 import datetime
-with con:
-    con.execute("""
+#with con:
+#    con.execute(
+"""
         CREATE TABLE USER (
             id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            surname TEXT,
+            name TEXT NOT NULL,
+            surname TEXT NOT NULL,
             gender TEXT NOT NULL,
             age INTEGER NOT NULL,
             weight INTEGER NOT NULL,
@@ -17,10 +18,11 @@ with con:
             mail TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
         );
-    """)
-with con:
-    con.execute(
-        """
+"""
+#    )
+#with con:
+#    con.execute(
+"""
         CREATE TABLE DATA (
             id INTEGER NOT NULL,
             date datetime default current_timestamp,
@@ -31,7 +33,7 @@ with con:
             bus INTEGER
         );
         """
-    )
+#    )
 '''
 a='Pepe'
 #sql = f'INSERT INTO DATA (name, surname, age, weight, height, mail, password) values({a}, "Lopez", 20, 51, 165, pepito@gmail.com, pepito)'
@@ -87,6 +89,8 @@ con.executemany('INSERT INTO DATA (id, date, walking, car, train, still, bus) va
                 data_to_insert)
 con.commit()
 '''
-df_user = pd.read_sql_query("SELECT * FROM DATA", con)
-print('a')
+con = sl.connect('google_fit.db')
+df_user = pd.read_sql_query("SELECT * FROM USER", con)
+
+print('aa@gmail.com' in df_user['mail'])
 
