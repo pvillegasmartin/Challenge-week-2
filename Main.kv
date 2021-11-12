@@ -1,0 +1,298 @@
+#:import utils kivy.utils
+#:import FallOutTransition kivy.uix.screenmanager.FallOutTransition
+
+ScreenManager:
+    transition: FallOutTransition()
+    MenuScreen:
+    LoginScreen:
+    CredentialsScreen:
+    NewScreen:
+    ProfileScreen:
+
+<MenuScreen>:
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            source:'initial_image.png'
+            size: root.width, root.height
+            pos: self.pos
+
+    Label:
+        text: "GOOGLE FIT"
+        color: 250, 255, 1, 1
+        pos_hint: {"center_y": 0.9}
+        halign: "center"
+        font_size: root.width/15
+        bold: True
+
+    Button:
+        text: "New"
+        background_color: 2,1,1,1
+        pos_hint : {"center_x": 0.45, 'center_y':.2}
+        size_hint : (.1, .05)
+        on_press: app.root.current = 'new_screen'
+
+    Button:
+        text: "Login"
+        background_color: 2,1,1,1
+        pos_hint : {"center_x": 0.55, 'center_y':.2}
+        size_hint : (.1, .05)
+        on_press: app.root.current = 'credentials_screen'
+
+    Button:
+        text: "Exit"
+        text_color: 0, 0.26, 0.27, 1
+        pos_hint: {"center_x": 0.5, "center_y": 0.1}
+        size_hint : (.1, .05)
+        on_press: app.stop()
+
+
+<LoginScreen>:
+
+    name: 'login_screen'
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            source:'soft_color.png'
+            size: root.width, root.height
+            pos: self.pos
+    TextInput:
+        id: name
+        size_hint: None, 1
+        width: "100dp"
+        text: 'Pepito'
+        multiline: False
+        on_text_validate: root.on_text_validate(self)
+    Button:
+        text: "My Stats"
+        md_bg_color: 0, 0.26, 0.27, 1
+        pos_hint: {"center_x": 0.5, "center_y": 0.2}
+        size: 0.5,0.5
+        on_press: app.root.current = 'profile_screen'
+
+<CredentialsScreen>:
+
+    name: 'credentials_screen'
+
+    Label:
+        id: title
+        pos_hint : {"center_x": 0.5, 'center_y':.825}
+        font_size: root.width/20
+        size_hint : (.15, .05)
+        color: 250, 255, 1, 1
+        text: "Login page"
+
+    TextInput:
+        id: mail
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.5}
+        text: 'Type your mail'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: password
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.4}
+        text: 'Type your password'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    Button:
+        text: "Enter!"
+        text_color: 0, 0.26, 0.27, 1
+        pos_hint: {"center_x": 0.5, "center_y": 0.25}
+        size_hint : (.1, .05)
+
+
+        on_press: if (root.comprovar_mail(root.ids.mail.text) and not root.comprovar(root.ids.mail.text, root.ids.password.text)) or root.ids.password.text == 'Type your password': root.ids.password.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if not root.comprovar_mail(root.ids.mail.text) or root.ids.mail.text == 'Type your mail': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if root.comprovar_mail(root.ids.mail.text): root.ids.mail.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if not root.comprovar_mail(root.ids.mail.text) or root.ids.mail.text == 'Type your mail': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if root.comprovar(root.ids.mail.text, root.manager.get_screen("credentials_screen").ids.password.text): app.root.current = 'profile_screen'
+
+<NewScreen>:
+
+    name: 'new_screen'
+
+    Label:
+        id: title
+        pos_hint : {"center_x": 0.5, 'center_y':.9}
+        font_size: root.width/20
+        size_hint : (.15, .05)
+        color: 250, 255, 1, 1
+        text: "Register page"
+
+    TextInput:
+        id: name
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.8}
+        text: 'Type your name'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: surname
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.7}
+        text: 'Type your surname'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: gender
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.6}
+        text: 'Type your gender: W/M'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: age
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.5}
+        text: 'Type your age'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: weight
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.4}
+        text: 'Type your weight [kg]'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: height
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.3}
+        text: 'Type your height [cm]'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: mail
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.2}
+        text: 'Type your mail'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    TextInput:
+        id: password
+        size_hint_y: None
+        size_hint_x: None
+        height: 35
+        width: 500
+        font_size: self.height - 15
+        pos_hint : {"center_x": 0.5, 'center_y':.1}
+        text: 'Type your password'
+        multiline: False
+        on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
+
+    Button:
+        text: "Enter!"
+        text_color: 0, 0.26, 0.27, 1
+        pos_hint: {"center_x": 0.5, "center_y": 0.02}
+        size_hint : (.1, .05)
+
+        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): app.root.current = 'profile_screen'
+        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.insertar(root.ids.name.text,root.ids.surname.text,root.ids.gender.text,root.ids.age.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text)
+        on_press: if not root.ids.age.text.isnumeric() or root.ids.age.text=='Type your age'  or root.ids.age.text=='': root.ids.age.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if not root.ids.weight.text.isnumeric() or root.ids.weight.text=='Type your weight [kg]'  or root.ids.weight.text=='': root.ids.weight.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if not root.ids.height.text.isnumeric() or root.ids.height.text=='Type your height [cm]'  or root.ids.height.text=='': root.ids.height.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if '@' not in root.ids.mail.text or root.ids.mail.text=='Type your mail'  or root.ids.mail.text=='': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if root.ids.password.text=='Type your password'  or root.ids.password.text=='': root.ids.password.background_color = utils.get_color_from_hex('#fadcdc')
+        on_press: if not root.ids.gender.text in 'wmWM': root.ids.gender.background_color = utils.get_color_from_hex('#fadcdc')
+
+        on_press: if root.ids.age.text.isnumeric(): root.ids.age.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.weight.text.isnumeric() and int(root.ids.weight.text)>0 and int(root.ids.weight.text)<300: root.ids.weight.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.height.text.isnumeric() and int(root.ids.height.text)>50 and int(root.ids.height.text)<280: root.ids.height.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if '@' in root.ids.mail.text and '.' in root.ids.mail.text: root.ids.mail.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.password.text!='Type your password'  and root.ids.password.text!='': root.ids.password.background_color = utils.get_color_from_hex('#f0efef')
+        on_press: if root.ids.gender.text in 'wmWM': root.ids.gender.background_color = utils.get_color_from_hex('#f0efef')
+
+
+<ProfileScreen>:
+
+    name: 'profile_screen'
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            source:'soft_color.png'
+            size: root.width, root.height
+            pos: self.pos
+
+    Label:
+        id: name
+        pos_hint : {"x": 0.025, 'center_y':.90}
+        font_size: root.width/50
+        size_hint : (.1, .05)
+        color: 250, 255, 1, 1
+        text: root.email
+
+    Label:
+        id: label_progress
+        pos_hint : {"x": 0.025, 'center_y':.825}
+        font_size: root.width/50
+        size_hint : (.15, .05)
+        color: 250, 255, 1, 1
+        text: "Today's progress:"
+    ProgressBar:
+        id: progress_bar
+        pos_hint : {"x": 0.19, 'center_y':.82}
+        size_hint : (.1, .05)
+        color: 1,0,1,0
+        value: root.my_progress
+        min: 0
+        max: 100
+
+    Button:
+        text: "Refresh data"
+        background_color: 2,1,1,1
+        pos_hint : {"center_x": 0.925, 'center_y':.95}
+        size_hint : (.1, .05)
+        on_press: root.refresh_data()
+        on_release: root.manager.get_screen("profile_screen").ids.progress_bar.value=root.my_progress
+
+

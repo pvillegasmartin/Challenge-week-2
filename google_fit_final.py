@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, AdaBoostClassifier, \
     GradientBoostingClassifier, HistGradientBoostingClassifier
 from sklearn import metrics, model_selection
+import pickle
 import itertools
 
 from sklearn.tree import DecisionTreeClassifier
@@ -36,8 +37,8 @@ for L in range(0, len(stuff)+1):
 best_group = None
 best_test_acc = 0
 """
-groups_users=[['U2','U11','U5','U9']]
-
+#groups_users=[['U2','U11','U5','U9']]
+groups_users=[['U9']]
 
 
 for group in groups_users:
@@ -66,16 +67,18 @@ for group in groups_users:
         y_train = encoder.fit_transform(y_train)
         y_test = encoder.transform(y_test)
 
+        pd.DataFrame(x_test).to_csv('test_U9.csv', index=False)
+
         tree_classifiers = {
             #"Decision Tree": DecisionTreeClassifier(),
-            "Extra Trees": ExtraTreesClassifier(n_estimators=100),
-            "Random Forest": RandomForestClassifier(n_estimators=100),
+            #"Extra Trees": ExtraTreesClassifier(n_estimators=100),
+            #"Random Forest": RandomForestClassifier(n_estimators=100),
             #"AdaBoost": AdaBoostClassifier(n_estimators=100),
             #"Skl GBM": GradientBoostingClassifier(n_estimators=100),
             #"Skl HistGBM": HistGradientBoostingClassifier(max_iter=100),
             #"XGBoost": XGBClassifier(n_estimators=100),
             "LightGBM": LGBMClassifier(n_estimators=100),
-            "CatBoost": CatBoostClassifier(n_estimators=100),
+            #"CatBoost": CatBoostClassifier(n_estimators=100),
         }
 
         #skf = model_selection.StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
@@ -99,4 +102,5 @@ for group in groups_users:
     except:
         pass
 
-print(f'Best combination: {best_group} with an accuracy of {best_test_acc}')
+filename = 'finalized_model.sav'
+pickle.dump(model, open(filename, 'wb'))
