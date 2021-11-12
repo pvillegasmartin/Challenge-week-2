@@ -4,34 +4,34 @@ import pickle
 import numpy as np
 con = sl.connect('google_fit.db')
 import datetime
-#with con:
-#    con.execute("""
-#        CREATE TABLE USER (
-#            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-#            name TEXT,
-#            surname TEXT,
-#            gender TEXT NOT NULL,
-#            age INTEGER NOT NULL,
-#            weight INTEGER NOT NULL,
-#            height INTEGER NOT NULL,
-#            mail TEXT NOT NULL UNIQUE,
-#            password TEXT NOT NULL
-#        );
-#    """)
-#with con:
-#    con.execute(
-#        """
-#        CREATE TABLE DATA (
-#            id INTEGER NOT NULL,
-##            date datetime default current_timestamp,
-#            walking INTEGER,
-#           car INTEGER,
-#            train INTEGER,
-#            still INTEGER,
-#            bus INTEGER
-#        );
-#        """
-#    )
+with con:
+    con.execute("""
+        CREATE TABLE USER (
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            surname TEXT,
+            gender TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            weight INTEGER NOT NULL,
+            height INTEGER NOT NULL,
+            mail TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        );
+    """)
+with con:
+    con.execute(
+        """
+        CREATE TABLE DATA (
+            id INTEGER NOT NULL,
+            date datetime default current_timestamp,
+            walking INTEGER,
+           car INTEGER,
+            train INTEGER,
+            still INTEGER,
+            bus INTEGER
+        );
+        """
+    )
 '''
 a='Pepe'
 #sql = f'INSERT INTO DATA (name, surname, age, weight, height, mail, password) values({a}, "Lopez", 20, 51, 165, pepito@gmail.com, pepito)'

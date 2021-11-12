@@ -10,6 +10,7 @@ ScreenManager:
     ProfileScreen:
 
 <MenuScreen>:
+    name: 'menu_screen'
     canvas.before:
         Color:
             rgba: (1, 1, 1, 1)
@@ -20,37 +21,39 @@ ScreenManager:
 
     Label:
         text: "GOOGLE FIT"
-        color: 250, 255, 1, 1
-        pos_hint: {"center_y": 0.9}
+        color: 123, 227, 111, 100
+        pos_hint: {"center_y": 0.55}
         halign: "center"
-        font_size: root.width/15
+        font_size: root.width/10
         bold: True
 
     Button:
-        text: "New"
+        text: "Register"
         background_color: 2,1,1,1
-        pos_hint : {"center_x": 0.45, 'center_y':.2}
-        size_hint : (.1, .05)
+        pos_hint : {"center_x": 0.6, 'center_y':.3}
+        size_hint : (.2, .05)
         on_press: app.root.current = 'new_screen'
 
     Button:
         text: "Login"
-        background_color: 2,1,1,1
-        pos_hint : {"center_x": 0.55, 'center_y':.2}
-        size_hint : (.1, .05)
+        background_color: 2,1,1,0.35
+        pos_hint : {"center_x": 0.4, 'center_y':.3}
+        size_hint : (.2, .05)
         on_press: app.root.current = 'credentials_screen'
 
     Button:
         text: "Exit"
-        text_color: 0, 0.26, 0.27, 1
+        background_color: 0, 0.5, 0.5, 0.2
         pos_hint: {"center_x": 0.5, "center_y": 0.1}
         size_hint : (.1, .05)
         on_press: app.stop()
 
 
-<LoginScreen>:
 
-    name: 'login_screen'
+<CredentialsScreen>:
+
+    name: 'credentials_screen'
+
     canvas.before:
         Color:
             rgba: (1, 1, 1, 1)
@@ -58,31 +61,14 @@ ScreenManager:
             source:'soft_color.png'
             size: root.width, root.height
             pos: self.pos
-    TextInput:
-        id: name
-        size_hint: None, 1
-        width: "100dp"
-        text: 'Pepito'
-        multiline: False
-        on_text_validate: root.on_text_validate(self)
-    Button:
-        text: "My Stats"
-        md_bg_color: 0, 0.26, 0.27, 1
-        pos_hint: {"center_x": 0.5, "center_y": 0.2}
-        size: 0.5,0.5
-        on_press: app.root.current = 'profile_screen'
-
-<CredentialsScreen>:
-
-    name: 'credentials_screen'
 
     Label:
         id: title
         pos_hint : {"center_x": 0.5, 'center_y':.825}
         font_size: root.width/20
         size_hint : (.15, .05)
-        color: 250, 255, 1, 1
-        text: "Login page"
+        color: 123, 227, 111, 100
+        text: "LOGIN PAGE"
 
     TextInput:
         id: mail
@@ -110,7 +96,7 @@ ScreenManager:
 
     Button:
         text: "Enter!"
-        text_color: 0, 0.26, 0.27, 1
+        background_color: 2,1,1,1
         pos_hint: {"center_x": 0.5, "center_y": 0.25}
         size_hint : (.1, .05)
 
@@ -119,19 +105,37 @@ ScreenManager:
         on_press: if not root.comprovar_mail(root.ids.mail.text) or root.ids.mail.text == 'Type your mail': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if root.comprovar_mail(root.ids.mail.text): root.ids.mail.background_color = utils.get_color_from_hex('#f0efef')
         on_press: if not root.comprovar_mail(root.ids.mail.text) or root.ids.mail.text == 'Type your mail': root.ids.mail.background_color = utils.get_color_from_hex('#fadcdc')
-        on_press: if root.comprovar(root.ids.mail.text, root.manager.get_screen("credentials_screen").ids.password.text): app.root.current = 'profile_screen'
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): app.root.current = 'profile_screen'
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").cargar_datos()
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.pie_chart.source = root.manager.get_screen("profile_screen").cargar_datos()[0]
+        on_press: if root.comprovar(root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.bmi.text = 'BMI: ' + str(root.manager.get_screen("profile_screen").cargar_datos()[1])
+
+    Button:
+        text: "Back"
+        background_color: 0, 0.5, 0.5, 0.2
+        pos_hint: {"center_x": 0.5, "center_y": 0.1}
+        size_hint : (.1, .05)
+        on_press: app.root.current = 'menu_screen'
 
 <NewScreen>:
 
     name: 'new_screen'
 
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            source:'soft_color.png'
+            size: root.width, root.height
+            pos: self.pos
+
     Label:
         id: title
-        pos_hint : {"center_x": 0.5, 'center_y':.9}
+        pos_hint : {"center_x": 0.5, 'center_y':.925}
         font_size: root.width/20
         size_hint : (.15, .05)
-        color: 250, 255, 1, 1
-        text: "Register page"
+        color: 123, 227, 111, 100
+        text: "REGISTRATION PAGE"
 
     TextInput:
         id: name
@@ -152,7 +156,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.7}
+        pos_hint : {"center_x": 0.5, 'center_y':.72}
         text: 'Type your surname'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -164,7 +168,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.6}
+        pos_hint : {"center_x": 0.5, 'center_y':.64}
         text: 'Type your gender: W/M'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -176,7 +180,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.5}
+        pos_hint : {"center_x": 0.5, 'center_y':.56}
         text: 'Type your age'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -188,7 +192,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.4}
+        pos_hint : {"center_x": 0.5, 'center_y':.48}
         text: 'Type your weight [kg]'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -200,7 +204,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.3}
+        pos_hint : {"center_x": 0.5, 'center_y':.4}
         text: 'Type your height [cm]'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -212,7 +216,7 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.2}
+        pos_hint : {"center_x": 0.5, 'center_y':.32}
         text: 'Type your mail'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
@@ -224,19 +228,21 @@ ScreenManager:
         height: 35
         width: 500
         font_size: self.height - 15
-        pos_hint : {"center_x": 0.5, 'center_y':.1}
+        pos_hint : {"center_x": 0.5, 'center_y':.24}
         text: 'Type your password'
         multiline: False
         on_touch_down: if self.collide_point(*args[1].pos): self.text = ""
 
     Button:
         text: "Enter!"
-        text_color: 0, 0.26, 0.27, 1
-        pos_hint: {"center_x": 0.5, "center_y": 0.02}
+        background_color: 2,1,1,1
+        pos_hint: {"center_x": 0.57, "center_y": 0.07}
         size_hint : (.1, .05)
 
         on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): app.root.current = 'profile_screen'
         on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.insertar(root.ids.name.text,root.ids.surname.text,root.ids.gender.text,root.ids.age.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text)
+        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").cargar_datos_vacios()
+
         on_press: if not root.ids.age.text.isnumeric() or root.ids.age.text=='Type your age'  or root.ids.age.text=='': root.ids.age.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if not root.ids.weight.text.isnumeric() or root.ids.weight.text=='Type your weight [kg]'  or root.ids.weight.text=='': root.ids.weight.background_color = utils.get_color_from_hex('#fadcdc')
         on_press: if not root.ids.height.text.isnumeric() or root.ids.height.text=='Type your height [cm]'  or root.ids.height.text=='': root.ids.height.background_color = utils.get_color_from_hex('#fadcdc')
@@ -251,6 +257,16 @@ ScreenManager:
         on_press: if root.ids.password.text!='Type your password'  and root.ids.password.text!='': root.ids.password.background_color = utils.get_color_from_hex('#f0efef')
         on_press: if root.ids.gender.text in 'wmWM': root.ids.gender.background_color = utils.get_color_from_hex('#f0efef')
 
+        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.bmi.text = 'BMI: ' + str(root.manager.get_screen("profile_screen").cargar_datos_vacios()[1])
+        on_press: if root.comprovar(root.ids.age.text,root.ids.gender.text, root.ids.weight.text, root.ids.height.text,  root.ids.mail.text, root.ids.password.text): root.manager.get_screen("profile_screen").ids.pie_chart.source = root.manager.get_screen("profile_screen").cargar_datos_vacios()[0]
+
+
+    Button:
+        text: "Back"
+        background_color: 0, 0.5, 0.5, 0.2
+        pos_hint: {"center_x": 0.43, "center_y": 0.07}
+        size_hint : (.1, .05)
+        on_press: app.root.current = 'menu_screen'
 
 <ProfileScreen>:
 
@@ -263,36 +279,60 @@ ScreenManager:
             size: root.width, root.height
             pos: self.pos
 
+    Image:
+        id: pie_chart
+        source: root.image_path
+        size_hint : (.75, .7)
+        pos_hint : {"center_x": 0.5, 'center_y':.4}
+
     Label:
-        id: name
-        pos_hint : {"x": 0.025, 'center_y':.90}
-        font_size: root.width/50
-        size_hint : (.1, .05)
-        color: 250, 255, 1, 1
-        text: root.email
+        id: user_name
+        pos_hint : {"center_x": 0.5, 'center_y':.90}
+        font_size: root.width/17
+        color: 123, 227, 111, 100
+        text: (root.name_user).upper()
 
     Label:
         id: label_progress
-        pos_hint : {"x": 0.025, 'center_y':.825}
-        font_size: root.width/50
+        pos_hint : {"x": 0.025, 'center_y':.8}
+        font_size: 16
         size_hint : (.15, .05)
-        color: 250, 255, 1, 1
+        color: 123, 227, 111, 100
         text: "Today's progress:"
     ProgressBar:
         id: progress_bar
-        pos_hint : {"x": 0.19, 'center_y':.82}
-        size_hint : (.1, .05)
-        color: 1,0,1,0
+        pos_hint : {"x": 0.25, 'center_y':.795}
+        size_hint : (.3, .05)
+        background_color: 0.5,0.5,0.5,1
+        color: 0.5,0.5,0.5,1
         value: root.my_progress
         min: 0
         max: 100
 
+    Label:
+        id: bmi
+        pos_hint : {"x": 0.025, 'center_y':.75}
+        font_size: 16
+        size_hint : (.1, .05)
+        color: 123, 227, 111, 100
+
     Button:
-        text: "Refresh data"
+        text: "Refresh"
         background_color: 2,1,1,1
         pos_hint : {"center_x": 0.925, 'center_y':.95}
         size_hint : (.1, .05)
-        on_press: root.refresh_data()
-        on_release: root.manager.get_screen("profile_screen").ids.progress_bar.value=root.my_progress
+        on_press: root.ids.pie_chart.source = root.refresh_data()[0]
+        on_press: root.ids.bmi.text = 'BMI: ' + str(root.refresh_data()[1])
 
+        on_press: if root.my_progress<30: root.ids.progress_bar.color = utils.get_color_from_hex('#e35744')
+        on_press: if (root.my_progress>=30 and root.my_progress<=65): root.ids.progress_bar.color = utils.get_color_from_hex('#e3d344')
+        on_press: if (root.my_progress>65 and root.my_progress<=100): root.ids.progress_bar.color = utils.get_color_from_hex('#6ab562')
 
+        on_release: root.ids.progress_bar.value=root.my_progress
+
+    Button:
+        text: "Log out"
+        background_color: 0, 0.5, 0.5, 0.2
+        pos_hint : {"center_x": 0.925, 'center_y':.875}
+        size_hint : (.1, .05)
+        on_press: app.root.current = 'menu_screen'
